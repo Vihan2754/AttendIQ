@@ -32,6 +32,11 @@ venv/
 ENV/
 env/
 
+# Environment configuration and secrets
+.env
+.env.*
+!.env.example
+
 # IDE & Editor files
 .vscode/
 .idea/
@@ -49,3 +54,6 @@ htmlcov/
 # Logs & temp
 *.log
 *.tmp
+
+# Executable build artifacts
+*.exe
