@@ -1,0 +1,2428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AttendIQ - Employee Attendance &amp; Analytics</title>
+  <meta name="description" content="Next-generation HR Attendance Tracking &amp; Analytics Dashboard with real-time analytics, leaderboard, department trends, and interactive API explorer." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-base: #060b14;
+      --bg-surface: #0b1322;
+      --bg-card: #101c30;
+      --bg-card-hover: #162540;
+      --bg-input: #0a1120;
+      --border: rgba(148, 163, 184, 0.12);
+      --border-focus: rgba(45, 212, 191, 0.5);
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --teal: #14b8a6;
+      --teal-light: #2dd4bf;
+      --purple: #8b5cf6;
+      --purple-light: #a78bfa;
+      --amber: #f59e0b;
+      --amber-light: #fbbf24;
+      --rose: #ef4444;
+      --rose-light: #f87171;
+      --blue: #3b82f6;
+      --blue-light: #60a5fa;
+      --green: #10b981;
+      --green-light: #34d399;
+      --sidebar-width: 250px;
+      --header-h: 68px;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --shadow-card: 0 10px 30px -10px rgba(0,0,0,0.5), 0 0 0 1px var(--border);
+      --shadow-glow-teal: 0 0 25px -5px rgba(45, 212, 191, 0.25);
+      --shadow-glow-purple: 0 0 25px -5px rgba(139, 92, 246, 0.25);
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    html, body { height: 100%; overflow: hidden; background: var(--bg-base); color: var(--text-primary); font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 14px; line-height: 1.5; }
+    code, pre, .font-mono { font-family: 'JetBrains Mono', monospace; }
+    
+    /* Layout */
+    body { display: flex; }
+    #sidebar {
+      width: var(--sidebar-width);
+      height: 100vh;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      z-index: 20;
+    }
+    .logo-container {
+      height: var(--header-h);
+      padding: 0 22px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(11, 19, 34, 0.7);
+      backdrop-filter: blur(12px);
+    }
+    .logo-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--teal-light), var(--purple));
+      display: grid;
+      place-items: center;
+      font-size: 15px;
+      font-weight: 800;
+      color: white;
+      box-shadow: var(--shadow-glow-teal);
+    }
+    .logo-text {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(120deg, #fff 30%, var(--teal-light) 70%, var(--purple-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .logo-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: rgba(45, 212, 191, 0.12);
+      color: var(--teal-light);
+      border: 1px solid rgba(45, 212, 191, 0.25);
+    }
+    
+    nav {
+      flex: 1;
+      padding: 16px 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    nav::-webkit-scrollbar { width: 4px; }
+    nav::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.2); border-radius: 4px; }
+    .nav-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 12px 10px 4px;
+    }
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 13.5px;
+      cursor: pointer;
+      transition: var(--transition);
+      border: 1px solid transparent;
+      user-select: none;
+    }
+    .nav-btn:hover {
+      background: var(--bg-card);
+      color: var(--text-primary);
+    }
+    .nav-btn.active {
+      background: rgba(45, 212, 191, 0.12);
+      color: var(--teal-light);
+      font-weight: 600;
+      border-color: rgba(45, 212, 191, 0.25);
+      box-shadow: 0 2px 12px rgba(45, 212, 191, 0.1);
+    }
+    .nav-icon { font-size: 15px; width: 20px; text-align: center; }
+    
+    .sidebar-footer {
+      padding: 14px;
+      border-top: 1px solid var(--border);
+    }
+    .api-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      color: var(--green-light);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green-light);
+      box-shadow: 0 0 8px var(--green-light);
+      animation: pulse 2s infinite ease-in-out;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.85); } }
+
+    /* Main Area */
+    #main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    header {
+      height: var(--header-h);
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: rgba(11, 19, 34, 0.6);
+      backdrop-filter: blur(12px);
+      flex-shrink: 0;
+    }
+    .header-titles h1 { font-size: 19px; font-weight: 700; color: #fff; letter-spacing: -0.01em; }
+    .header-titles p { font-size: 12px; color: var(--text-secondary); }
+    .header-actions { display: flex; align-items: center; gap: 10px; }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      border: 1px solid transparent;
+      font-family: inherit;
+      user-select: none;
+    }
+    .btn-ghost {
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      border-color: var(--border);
+    }
+    .btn-ghost:hover {
+      background: var(--bg-card-hover);
+      color: var(--text-primary);
+      border-color: rgba(148, 163, 184, 0.25);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--teal-light), #3b82f6);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(45, 212, 191, 0.25);
+    }
+    .btn-primary:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(45, 212, 191, 0.35);
+    }
+    .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
+    .btn-xs { padding: 3px 8px; font-size: 11px; border-radius: 4px; }
+
+    /* Content Area */
+    #content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 26px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+    #content::-webkit-scrollbar { width: 6px; }
+    #content::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.2); border-radius: 4px; }
+    
+    .page { display: none; flex-direction: column; gap: 22px; }
+    .page.active { display: flex; }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .title-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    .card-body { padding: 20px; }
+    
+    /* Stat Cards */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 1100px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+    }
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      box-shadow: var(--shadow-card);
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(148, 163, 184, 0.3);
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+    .stat-card.teal::before { background: linear-gradient(90deg, var(--teal-light), transparent); }
+    .stat-card.purple::before { background: linear-gradient(90deg, var(--purple-light), transparent); }
+    .stat-card.amber::before { background: linear-gradient(90deg, var(--amber-light), transparent); }
+    .stat-card.rose::before { background: linear-gradient(90deg, var(--rose-light), transparent); }
+    
+    .stat-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .stat-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+    }
+    .stat-card.teal .stat-icon { background: rgba(45, 212, 191, 0.12); color: var(--teal-light); }
+    .stat-card.purple .stat-icon { background: rgba(167, 139, 250, 0.12); color: var(--purple-light); }
+    .stat-card.amber .stat-icon { background: rgba(251, 191, 36, 0.12); color: var(--amber-light); }
+    .stat-card.rose .stat-icon { background: rgba(248, 113, 113, 0.12); color: var(--rose-light); }
+    .stat-pill {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.1);
+      color: var(--text-secondary);
+    }
+    .stat-num { font-size: 26px; font-weight: 800; color: #fff; letter-spacing: -0.02em; }
+    .stat-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+    /* Tables */
+    .table-container { overflow-x: auto; width: 100%; }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+    .data-table th {
+      padding: 12px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: rgba(11, 19, 34, 0.4);
+      white-space: nowrap;
+    }
+    .data-table td {
+      padding: 13px 16px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tbody tr { transition: background 0.15s ease; }
+    .data-table tbody tr:hover { background: rgba(148, 163, 184, 0.04); }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .badge-present { background: rgba(45, 212, 191, 0.12); color: var(--teal-light); border: 1px solid rgba(45, 212, 191, 0.3); }
+    .badge-absent { background: rgba(248, 113, 113, 0.12); color: var(--rose-light); border: 1px solid rgba(248, 113, 113, 0.3); }
+    .badge-leave { background: rgba(167, 139, 250, 0.12); color: var(--purple-light); border: 1px solid rgba(167, 139, 250, 0.3); }
+    .badge-wfh { background: rgba(96, 165, 250, 0.12); color: var(--blue-light); border: 1px solid rgba(96, 165, 250, 0.3); }
+    .badge-duty { background: rgba(251, 191, 36, 0.12); color: var(--amber-light); border: 1px solid rgba(251, 191, 36, 0.3); }
+
+    /* Forms */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); display: flex; justify-content: space-between; align-items: center; }
+    .form-control {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      padding: 9px 12px;
+      font-size: 13px;
+      font-family: inherit;
+      transition: var(--transition);
+      outline: none;
+      width: 100%;
+    }
+    .form-control:focus {
+      border-color: var(--teal-light);
+      box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.15);
+    }
+    select.form-control { cursor: pointer; }
+    select.form-control option { background: #0f172a; color: #fff; padding: 6px; }
+    textarea.form-control { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+
+    /* Time Control Helpers */
+    .time-picker-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .quick-preset-btns {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .preset-chip {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(148, 163, 184, 0.08);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: var(--transition);
+      user-select: none;
+    }
+    .preset-chip:hover {
+      background: rgba(45, 212, 191, 0.12);
+      color: var(--teal-light);
+      border-color: rgba(45, 212, 191, 0.3);
+    }
+    .sub-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Filter Bar */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Leaderboard items */
+    .lb-list { display: flex; flex-direction: column; gap: 8px; padding: 14px; }
+    .lb-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      background: rgba(11, 19, 34, 0.5);
+      border: 1px solid var(--border);
+      transition: var(--transition);
+    }
+    .lb-row:hover { background: var(--bg-card-hover); border-color: rgba(148, 163, 184, 0.25); }
+    .lb-left { display: flex; align-items: center; gap: 14px; }
+    .lb-rank {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .lb-rank.gold { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; box-shadow: 0 0 12px rgba(245, 158, 11, 0.3); }
+    .lb-rank.silver { background: linear-gradient(135deg, #94a3b8, #64748b); color: #fff; }
+    .lb-rank.bronze { background: linear-gradient(135deg, #b45309, #78350f); color: #fff; }
+    .lb-rank.other { background: rgba(148, 163, 184, 0.1); color: var(--text-secondary); }
+    .lb-name { font-weight: 600; color: #fff; }
+    .lb-sub { font-size: 11px; color: var(--text-muted); }
+    .lb-right { text-align: right; }
+    .lb-minutes { font-size: 15px; font-weight: 800; color: var(--rose-light); font-family: 'JetBrains Mono', monospace; }
+    .lb-days { font-size: 11px; color: var(--text-muted); }
+
+    /* Chart visualization */
+    .chart-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 16px 20px 20px;
+    }
+    .bars-wrap {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      height: 140px;
+      padding-top: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .bar-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      height: 100%;
+      justify-content: flex-end;
+      position: relative;
+    }
+    .bar-group:hover .bar-tooltip { opacity: 1; visibility: visible; transform: translateY(-4px); }
+    .bar-tooltip {
+      position: absolute;
+      bottom: 100%;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 11px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.15s ease;
+      z-index: 10;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+    }
+    .bar-col {
+      width: 100%;
+      max-width: 22px;
+      border-radius: 4px 4px 0 0;
+      transition: height 0.3s ease;
+    }
+    .bar-present { background: var(--teal-light); }
+    .bar-late { background: var(--amber-light); }
+    .bar-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .chart-legend {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+    /* Alert / Result boxes */
+    .alert {
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .alert-success { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: var(--green-light); }
+    .alert-error { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--rose-light); }
+    .alert-info { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: var(--blue-light); }
+
+    /* Pagination */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-top: 1px solid var(--border);
+    }
+    .pg-info { font-size: 12px; color: var(--text-muted); }
+    .pg-btns { display: flex; gap: 6px; }
+    .pg-btn {
+      min-width: 30px;
+      height: 30px;
+      padding: 0 8px;
+      border-radius: 6px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: var(--transition);
+    }
+    .pg-btn:hover { background: var(--bg-card-hover); color: #fff; }
+    .pg-btn.active { background: var(--teal-light); color: #042f2e; border-color: var(--teal-light); }
+    .pg-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(6px);
+      display: none;
+      place-items: center;
+      z-index: 100;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: grid; }
+    .modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 540px;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6);
+      overflow: hidden;
+      animation: modalSlide 0.2s ease-out;
+    }
+    @keyframes modalSlide { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    .modal-head {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-head h3 { font-size: 16px; font-weight: 700; color: #fff; }
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 18px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .modal-close:hover { color: #fff; }
+    .modal-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+    .modal-foot {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      background: rgba(11, 19, 34, 0.4);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    /* API Explorer */
+    .explorer-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .explorer-layout { grid-template-columns: 1fr; }
+    }
+    .ep-list { display: flex; flex-direction: column; gap: 5px; }
+    .ep-item {
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      background: rgba(11, 19, 34, 0.5);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: var(--transition);
+    }
+    .ep-item:hover { background: var(--bg-card-hover); border-color: rgba(148, 163, 184, 0.25); }
+    .ep-item.active { background: rgba(45, 212, 191, 0.1); border-color: rgba(45, 212, 191, 0.35); }
+    .method-tag {
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .method-get { background: rgba(59, 130, 246, 0.15); color: var(--blue-light); }
+    .method-post { background: rgba(16, 185, 129, 0.15); color: var(--green-light); }
+    .method-patch { background: rgba(251, 191, 36, 0.15); color: var(--amber-light); }
+    .ep-path { font-size: 12.5px; font-weight: 600; color: #fff; word-break: break-all; font-family: 'JetBrains Mono', monospace; }
+    .ep-desc { font-size: 11px; color: var(--text-muted); }
+
+    .response-box {
+      background: #070d18;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #93c5fd;
+      max-height: 400px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    /* Empty state */
+    .empty-state {
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .empty-icon { font-size: 32px; opacity: 0.7; }
+    .spinner {
+      width: 16px; height: 16px; border: 2px solid rgba(45, 212, 191, 0.2);
+      border-top-color: var(--teal-light); border-radius: 50%;
+      animation: spin 0.7s linear infinite; display: inline-block; vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div class="logo-container">
+    <div class="logo-icon">AI</div>
+    <div>
+      <div class="logo-text">AttendIQ</div>
+      <div style="display:flex;gap:6px;align-items:center;margin-top:1px;">
+        <span class="logo-badge">v2.0 PRO</span>
+      </div>
+    </div>
+  </div>
+
+  <nav>
+    <div class="nav-label">Overview</div>
+    <div class="nav-btn active" id="nav-dashboard" onclick="navigate('dashboard')">
+      <span class="nav-icon">&#9783;</span> Dashboard
+    </div>
+
+    <div class="nav-label">Management</div>
+    <div class="nav-btn" id="nav-employees" onclick="navigate('employees')">
+      <span class="nav-icon">&#128101;</span> Employees
+    </div>
+    <div class="nav-btn" id="nav-attendance" onclick="navigate('attendance')">
+      <span class="nav-icon">&#128203;</span> Attendance Logs
+    </div>
+    <div class="nav-btn" id="nav-punch" onclick="navigate('punch')">
+      <span class="nav-icon">&#9201;</span> Punch In / Out
+    </div>
+
+    <div class="nav-label">Analytics &amp; Insights</div>
+    <div class="nav-btn" id="nav-monthly" onclick="navigate('monthly')">
+      <span class="nav-icon">&#128197;</span> Monthly Analytics
+    </div>
+    <div class="nav-btn" id="nav-dept" onclick="navigate('dept')">
+      <span class="nav-icon">&#127970;</span> Department Summary
+    </div>
+    <div class="nav-btn" id="nav-trend" onclick="navigate('trend')">
+      <span class="nav-icon">&#128200;</span> Department Trend
+    </div>
+    <div class="nav-btn" id="nav-leaderboard" onclick="navigate('leaderboard')">
+      <span class="nav-icon">&#127942;</span> Late Leaderboard
+    </div>
+
+    <div class="nav-label">Developer</div>
+    <div class="nav-btn" id="nav-explorer" onclick="navigate('explorer')">
+      <span class="nav-icon">&#9881;</span> API Explorer
+    </div>
+    <div class="nav-btn" onclick="window.open('/docs','_blank')">
+      <span class="nav-icon">&#128366;</span> Swagger Docs &#8599;
+    </div>
+    <div class="nav-btn" onclick="window.open('/redoc','_blank')">
+      <span class="nav-icon">&#128196;</span> ReDoc &#8599;
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="api-badge" id="api-badge">
+      <div class="pulse-dot" id="api-dot"></div>
+      <span id="api-badge-text">Connected to API</span>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN APP -->
+<div id="main">
+  <header>
+    <div class="header-titles">
+      <h1 id="page-title">Dashboard</h1>
+      <p id="page-subtitle">Real-time attendance &amp; organization analytics</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-ghost" onclick="refreshCurrent()">&#8635; Refresh</button>
+      <button class="btn btn-primary" onclick="navigate('punch')">+ Record Punch</button>
+    </div>
+  </header>
+
+  <div id="content">
+
+    <!-- PAGE: DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-row">
+        <div class="stat-card teal">
+          <div class="stat-top">
+            <div class="stat-icon">&#128187;</div>
+            <span class="stat-pill" id="badge-db-status">Online</span>
+          </div>
+          <div class="stat-num" id="stat-db">ok</div>
+          <div class="stat-desc">MongoDB Connection</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-top">
+            <div class="stat-icon">&#128101;</div>
+            <span class="stat-pill" id="badge-emp-total">Headcount</span>
+          </div>
+          <div class="stat-num" id="stat-emp">-</div>
+          <div class="stat-desc">Active Employees</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-top">
+            <div class="stat-icon">&#128203;</div>
+            <span class="stat-pill">Logs</span>
+          </div>
+          <div class="stat-num" id="stat-logs">-</div>
+          <div class="stat-desc">Attendance Records</div>
+        </div>
+        <div class="stat-card rose">
+          <div class="stat-top">
+            <div class="stat-icon">&#127942;</div>
+            <span class="stat-pill" id="badge-late-month">2026-07</span>
+          </div>
+          <div class="stat-num" id="stat-late">-</div>
+          <div class="stat-desc">Late Employees (Month)</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:20px;">
+        <!-- Dept Trend Chart -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="title-dot" style="background:var(--teal-light)"></span>
+              Daily Department Trend
+            </div>
+            <select class="form-control" id="dash-dept-sel" style="width:auto;font-size:12px;padding:5px 10px;" onchange="loadDashboardTrend()">
+              <option value="">Loading departments...</option>
+            </select>
+          </div>
+          <div class="chart-container">
+            <div class="bars-wrap" id="dash-chart-bars">
+              <div class="empty-state" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
+                <span class="spinner"></span>
+              </div>
+            </div>
+            <div class="bar-labels" id="dash-chart-labels"></div>
+            <div class="chart-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:var(--teal-light)"></div> Present Count</div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--amber-light)"></div> Late Count</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Late Arrivals Leaderboard Mini -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="title-dot" style="background:var(--rose-light)"></span>
+              Late-Arrival Leaderboard
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="navigate('leaderboard')">Full View &rarr;</button>
+          </div>
+          <div class="lb-list" id="dash-lb-list">
+            <div class="empty-state"><span class="spinner"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Attendance Table -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="title-dot" style="background:var(--purple-light)"></span>
+            Recent Attendance Logs
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="navigate('attendance')">View All &rarr;</button>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Emp Code</th>
+                <th>Date</th>
+                <th>Punch In (IST)</th>
+                <th>Punch Out (IST)</th>
+                <th>Work Hours</th>
+                <th>Status</th>
+                <th>Late (min)</th>
+                <th>OT (min)</th>
+              </tr>
+            </thead>
+            <tbody id="dash-recent-body">
+              <tr><td colspan="8" style="text-align:center;padding:24px;"><span class="spinner"></span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: EMPLOYEES -->
+    <div class="page" id="page-employees">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">&#128101; Employee Directory</div>
+          <div class="filter-bar">
+            <select class="form-control" id="emp-dept-filter" style="width:180px" onchange="loadEmployees(1)">
+              <option value="">All Departments</option>
+            </select>
+            <button class="btn btn-primary" onclick="openAddEmployeeModal()">+ New Employee</button>
+          </div>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Emp Code</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th>Shift</th>
+                <th>Joined On</th>
+              </tr>
+            </thead>
+            <tbody id="emp-table-body">
+              <tr><td colspan="6" style="text-align:center;padding:24px;"><span class="spinner"></span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span class="pg-info" id="emp-pg-info">Showing records</span>
+          <div class="pg-btns" id="emp-pg-btns"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: ATTENDANCE LOGS -->
+    <div class="page" id="page-attendance">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">&#128203; Attendance Logs</div>
+          <div class="filter-bar">
+            <!-- Dropdown for existing employees -->
+            <select class="form-control" id="att-filter-emp" style="width:200px" onchange="loadAttendance(1)">
+              <option value="">All Employees</option>
+            </select>
+            <select class="form-control" id="att-filter-status" style="width:140px" onchange="loadAttendance(1)">
+              <option value="">All Statuses</option>
+              <option value="PRESENT">PRESENT</option>
+              <option value="ABSENT">ABSENT</option>
+              <option value="LEAVE">LEAVE</option>
+              <option value="WFH">WFH</option>
+              <option value="ON_DUTY">ON_DUTY</option>
+            </select>
+            <input class="form-control" id="att-filter-from" type="date" value="2026-07-01" style="width:140px" onchange="loadAttendance(1)" />
+            <input class="form-control" id="att-filter-to" type="date" value="2026-07-15" style="width:140px" onchange="loadAttendance(1)" />
+            <button class="btn btn-ghost btn-sm" onclick="clearAttendanceFilters()">Reset</button>
+          </div>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Emp Code</th>
+                <th>Date</th>
+                <th>Punch In (IST)</th>
+                <th>Punch Out (IST)</th>
+                <th>Work Hours</th>
+                <th>Status</th>
+                <th>Late (min)</th>
+                <th>OT (min)</th>
+              </tr>
+            </thead>
+            <tbody id="att-table-body">
+              <tr><td colspan="8" style="text-align:center;padding:24px;"><span class="spinner"></span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span class="pg-info" id="att-pg-info">Showing records</span>
+          <div class="pg-btns" id="att-pg-btns"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: PUNCH IN / OUT -->
+    <div class="page" id="page-punch">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch;">
+        <!-- Punch In -->
+        <div class="card" style="display:flex;flex-direction:column;height:100%;">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="title-dot" style="background:var(--green-light)"></span>
+              Punch In (Clock In)
+            </div>
+            <span class="badge badge-present">Shift Start</span>
+          </div>
+          <div class="card-body" style="display:flex;flex-direction:column;flex:1;justify-content:space-between;gap:18px;">
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div class="form-grid form-grid-2" style="grid-template-columns:1.35fr 1fr;gap:14px;">
+                <div class="form-group">
+                  <label class="form-label">
+                    Select Employee *
+                    <span id="pi-shift-badge" class="sub-hint">09:30 - 18:30</span>
+                  </label>
+                  <select class="form-control" id="pi-emp" onchange="onPunchInEmpChange()">
+                    <option value="">Loading employees...</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">
+                    Presence Status
+                    <span class="sub-hint">R1 Rule</span>
+                  </label>
+                  <select class="form-control" id="pi-status">
+                    <option value="PRESENT">PRESENT (Office)</option>
+                    <option value="WFH">WFH (Remote)</option>
+                    <option value="ON_DUTY">ON_DUTY (Field/Client)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">
+                  Punch-In Time (IST)
+                  <span id="pi-epoch-hint" class="sub-hint">Date: Today</span>
+                </label>
+                <div class="time-picker-wrap">
+                  <input class="form-control font-mono" id="pi-time" type="time" step="60" onchange="onPunchInTimeChange()" />
+                  <div class="quick-preset-btns" style="margin-top:6px;">
+                    <span style="font-size:11px;color:var(--text-muted);margin-right:2px;">Quick Set:</span>
+                    <button type="button" class="preset-chip" onclick="setPunchInPreset('now')">&#9201; Current Time</button>
+                    <button type="button" class="preset-chip" onclick="setPunchInPreset('shift_start')">&#9728; Shift Start</button>
+                    <button type="button" class="preset-chip" onclick="setPunchInPreset('sample_late')">&#9888; Late (10:15 AM)</button>
+                    <button type="button" class="preset-chip" onclick="setPunchInPreset('early')">&#128336; Early (09:00 AM)</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:auto;display:flex;flex-direction:column;gap:10px;">
+              <button class="btn btn-primary" onclick="submitPunchIn()" style="width:100%;padding:10px 18px;font-size:13.5px;">
+                &#10003; Record Punch In &rarr;
+              </button>
+              <div id="pi-feedback" style="min-height:0;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Punch Out -->
+        <div class="card" style="display:flex;flex-direction:column;height:100%;">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="title-dot" style="background:var(--rose-light)"></span>
+              Punch Out (Clock Out)
+            </div>
+            <span class="badge badge-absent">Shift End</span>
+          </div>
+          <div class="card-body" style="display:flex;flex-direction:column;flex:1;justify-content:space-between;gap:18px;">
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div class="form-grid form-grid-2" style="grid-template-columns:1.35fr 1fr;gap:14px;">
+                <div class="form-group">
+                  <label class="form-label">
+                    Select Employee *
+                    <span id="po-shift-badge" class="sub-hint">09:30 - 18:30</span>
+                  </label>
+                  <select class="form-control" id="po-emp" onchange="onPunchOutEmpChange()">
+                    <option value="">Loading employees...</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">
+                    Checkout Mode
+                    <span class="sub-hint">Rules R3 &middot; R5</span>
+                  </label>
+                  <select class="form-control" id="po-mode" onchange="onPunchOutModeChange()">
+                    <option value="NORMAL">Standard Shift End</option>
+                    <option value="HALF_DAY">Half-Day (&lt; 4.5h)</option>
+                    <option value="OVERTIME">Overtime (&ge; 30m OT)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">
+                  Punch-Out Time (IST)
+                  <span id="po-epoch-hint" class="sub-hint">Date: Today</span>
+                </label>
+                <div class="time-picker-wrap">
+                  <input class="form-control font-mono" id="po-time" type="time" step="60" onchange="onPunchOutTimeChange()" />
+                  <div class="quick-preset-btns" style="margin-top:6px;">
+                    <span style="font-size:11px;color:var(--text-muted);margin-right:2px;">Quick Set:</span>
+                    <button type="button" class="preset-chip" onclick="setPunchOutPreset('now')">&#9201; Current Time</button>
+                    <button type="button" class="preset-chip" onclick="setPunchOutPreset('shift_end')">&#9789; Shift End</button>
+                    <button type="button" class="preset-chip" onclick="setPunchOutPreset('half_day')">&#9203; Half-Day (1:30 PM)</button>
+                    <button type="button" class="preset-chip" onclick="setPunchOutPreset('sample_ot')">&#128188; OT (7:45 PM)</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:auto;display:flex;flex-direction:column;gap:10px;">
+              <button class="btn btn-primary" onclick="submitPunchOut()" style="width:100%;padding:10px 18px;font-size:13.5px;background:linear-gradient(135deg,var(--rose-light),#ec4899);box-shadow:0 4px 14px rgba(248,113,113,0.25);">
+                &#10003; Record Punch Out &rarr;
+              </button>
+              <div id="po-feedback" style="min-height:0;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Regularization -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="title-dot" style="background:var(--amber-light)"></span>
+            Regularize Attendance Record
+          </div>
+          <span class="badge badge-duty">Manual Adjustment</span>
+        </div>
+        <div class="card-body">
+          <div class="form-grid" style="grid-template-columns: repeat(3, 1fr);">
+            <div class="form-group">
+              <label class="form-label">Employee *</label>
+              <!-- Dynamic Employee Dropdown -->
+              <select class="form-control" id="reg-emp"></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Attendance Date *</label>
+              <input class="form-control" id="reg-date" type="date" value="2026-07-06" onchange="onRegDateChange()" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">New Status (optional)</label>
+              <select class="form-control" id="reg-status">
+                <option value="">-- Keep Current --</option>
+                <option value="PRESENT">PRESENT</option>
+                <option value="ABSENT">ABSENT</option>
+                <option value="LEAVE">LEAVE</option>
+                <option value="WFH">WFH</option>
+                <option value="ON_DUTY">ON_DUTY</option>
+              </select>
+            </div>
+
+            <!-- Time pickers for Regularization -->
+            <div class="form-group">
+              <label class="form-label">
+                New Punch In Time
+                <span id="reg-in-hint" class="sub-hint">IST Time</span>
+              </label>
+              <input class="form-control font-mono" id="reg-in-time" type="time" value="09:30" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">
+                New Punch Out Time
+                <span id="reg-out-hint" class="sub-hint">IST Time</span>
+              </label>
+              <input class="form-control font-mono" id="reg-out-time" type="time" value="18:30" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Regularized By *</label>
+              <input class="form-control" id="reg-by" value="HR Manager" />
+            </div>
+
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label class="form-label">Reason * (minimum 5 characters)</label>
+              <input class="form-control" id="reg-reason" placeholder="Biometric sensor synchronization issue" value="Biometric scanner sync delay" />
+            </div>
+          </div>
+          <div style="margin-top:16px;">
+            <button class="btn btn-primary" onclick="submitRegularization()">Save Regularization &rarr;</button>
+          </div>
+          <div id="reg-feedback"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: MONTHLY ANALYTICS -->
+    <div class="page" id="page-monthly">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="title-dot" style="background:var(--purple-light)"></span>
+            Employee Monthly Analytics
+          </div>
+          <div class="filter-bar">
+            <!-- Dynamic Employee Dropdown -->
+            <select class="form-control" id="m-emp" style="width:230px;" onchange="loadMonthlyAnalytics()">
+              <option value="">Select Employee...</option>
+            </select>
+            <input class="form-control" id="m-month" type="month" value="2026-07" style="width:150px;" onchange="loadMonthlyAnalytics()" />
+            <button class="btn btn-primary" onclick="loadMonthlyAnalytics()">Analyze &rarr;</button>
+          </div>
+        </div>
+        <div class="card-body" id="monthly-content">
+          <div class="empty-state">
+            <div class="empty-icon">&#128197;</div>
+            <p>Select an employee from the dropdown above to view their complete monthly breakdown.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: DEPARTMENT SUMMARY -->
+    <div class="page" id="page-dept">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="title-dot" style="background:var(--blue-light)"></span>
+            Department Summary
+          </div>
+          <div class="filter-bar">
+            <input class="form-control" id="ds-month" type="month" value="2026-07" style="width:150px;" />
+            <select class="form-control" id="ds-dept" style="width:170px;">
+              <option value="">All Departments</option>
+            </select>
+            <button class="btn btn-primary" onclick="loadDepartmentSummary()">Load Summary &rarr;</button>
+          </div>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Department</th>
+                <th>Headcount</th>
+                <th>Present Days</th>
+                <th>Avg Work Hours</th>
+                <th>Late Count</th>
+                <th>Late (min)</th>
+                <th>Leave Count</th>
+                <th>On Duty Count</th>
+              </tr>
+            </thead>
+            <tbody id="ds-table-body">
+              <tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text-muted)">Click Load Summary to fetch department statistics.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: DEPARTMENT TREND -->
+    <div class="page" id="page-trend">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="title-dot" style="background:var(--teal-light)"></span>
+            Department Daily Trend Analytics
+          </div>
+          <div class="filter-bar">
+            <select class="form-control" id="tr-dept" style="width:170px;"></select>
+            <input class="form-control" id="tr-from" type="date" value="2026-07-01" style="width:140px;" />
+            <input class="form-control" id="tr-to" type="date" value="2026-07-15" style="width:140px;" />
+            <button class="btn btn-primary" onclick="loadTrendPage()">Generate Trend &rarr;</button>
+          </div>
+        </div>
+        <div class="chart-container">
+          <div class="bars-wrap" id="tr-chart-bars" style="height:160px;">
+            <div class="empty-state" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
+              <p>Select parameters and click Generate Trend.</p>
+            </div>
+          </div>
+          <div class="bar-labels" id="tr-chart-labels"></div>
+          <div class="chart-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--teal-light)"></div> Present Count</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--amber-light)"></div> Late Count</div>
+          </div>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Working Day</th>
+                <th>Headcount</th>
+                <th>Present Count</th>
+                <th>Late Count</th>
+                <th>Attendance Rate</th>
+                <th>7-Day Moving Avg</th>
+              </tr>
+            </thead>
+            <tbody id="tr-table-body">
+              <tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted)">No data loaded yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: LATE LEADERBOARD -->
+    <div class="page" id="page-leaderboard">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="title-dot" style="background:var(--rose-light)"></span>
+            Late-Arrival Leaderboard
+          </div>
+          <div class="filter-bar">
+            <input class="form-control" id="lb-month" type="month" value="2026-07" style="width:150px;" />
+            <select class="form-control" id="lb-dept" style="width:170px;">
+              <option value="">All Departments</option>
+            </select>
+            <input class="form-control" id="lb-limit" type="number" value="10" min="1" max="50" style="width:80px;" title="Limit" />
+            <button class="btn btn-primary" onclick="loadLeaderboardPage()">Rank &rarr;</button>
+          </div>
+        </div>
+        <div class="lb-list" id="lb-full-list">
+          <div class="empty-state"><p>Click Rank to fetch the late-arrival leaderboard.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: API EXPLORER -->
+    <div class="page" id="page-explorer">
+      <div class="explorer-layout">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">&#128279; Endpoints</div>
+          </div>
+          <div class="card-body" style="padding:10px;">
+            <div class="ep-list" id="explorer-ep-list"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title" id="explorer-cur-title">Select Endpoint</div>
+            <button class="btn btn-primary btn-sm" id="explorer-run-btn" onclick="runExplorerQuery()" style="display:none;">Execute Request &#9658;</button>
+          </div>
+          <div class="card-body">
+            <div id="explorer-form-wrap">
+              <div class="empty-state"><p>Choose an API endpoint from the sidebar to inspect and execute queries.</p></div>
+            </div>
+            
+            <div style="margin-top:20px;display:none;" id="explorer-resp-wrap">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <span class="form-label">Response Output</span>
+                <span id="explorer-status-badge" class="badge"></span>
+              </div>
+              <div class="response-box" id="explorer-resp-box"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL: ADD EMPLOYEE -->
+<div class="modal-overlay" id="modal-add-emp">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Add New Employee</h3>
+      <button class="modal-close" onclick="closeAddEmployeeModal()">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Employee Code * (EMP\d{4,6})</label>
+          <input class="form-control font-mono" id="ae-code" placeholder="EMP0007" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Full Name *</label>
+          <input class="form-control" id="ae-name" placeholder="Priya Sharma" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address *</label>
+          <input class="form-control" id="ae-email" type="email" placeholder="priya@example.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Department *</label>
+          <input class="form-control" id="ae-dept" placeholder="Engineering" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Shift Start (HH:MM)</label>
+          <input class="form-control font-mono" id="ae-shift-s" type="time" value="09:30" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Shift End (HH:MM)</label>
+          <input class="form-control font-mono" id="ae-shift-e" type="time" value="18:30" />
+        </div>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">Joined On (YYYY-MM-DD) *</label>
+          <input class="form-control" id="ae-joined" type="date" value="2026-07-01" />
+        </div>
+      </div>
+      <div id="ae-feedback"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeAddEmployeeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitCreateEmployee()">Save Employee</button>
+    </div>
+  </div>
+</div>
+
+<!-- JAVASCRIPT LOGIC -->
+<script>
+const DEFAULT_MONTH = '2026-07';
+let cachedDepartments = [];
+let cachedEmployees = [];
+
+// Navigation State
+const pages = {
+  dashboard: { title: 'Dashboard', sub: 'Real-time attendance & organization analytics', load: loadDashboard },
+  employees: { title: 'Employees', sub: 'Manage staff and department assignments', load: () => loadEmployees(1) },
+  attendance: { title: 'Attendance Logs', sub: 'Review real-time punch records and hours', load: () => loadAttendance(1) },
+  punch: { title: 'Punch In / Out', sub: 'Record staff attendance or submit regularization', load: initPunchPage },
+  monthly: { title: 'Monthly Analytics', sub: 'Individual monthly attendance breakdown', load: initMonthlyPage },
+  dept: { title: 'Department Summary', sub: 'Departmental hours and presence breakdown', load: loadDepartmentSummary },
+  trend: { title: 'Department Trend', sub: 'Daily trend and 7-day moving averages', load: loadTrendPage },
+  leaderboard: { title: 'Late Leaderboard', sub: 'Ranking of most tardy staff members', load: loadLeaderboardPage },
+  explorer: { title: 'API Explorer', sub: 'Live testing suite for all REST endpoints', load: initExplorer },
+};
+
+let curPage = 'dashboard';
+
+function navigate(key) {
+  if (!pages[key]) return;
+  curPage = key;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pageEl = document.getElementById('page-' + key);
+  if (pageEl) pageEl.classList.add('active');
+
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const navBtn = document.getElementById('nav-' + key);
+  if (navBtn) navBtn.classList.add('active');
+
+  document.getElementById('page-title').textContent = pages[key].title;
+  document.getElementById('page-subtitle').textContent = pages[key].sub;
+
+  pages[key].load();
+}
+
+function refreshCurrent() {
+  if (pages[curPage]) pages[curPage].load();
+}
+
+// Network Helper
+async function api(path, opts = {}) {
+  try {
+    const res = await fetch(path, {
+      headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) },
+      ...opts
+    });
+    let body = null;
+    try { body = await res.json(); } catch(e) {}
+    return { ok: res.ok, status: res.status, body };
+  } catch (err) {
+    return { ok: false, status: 0, body: { detail: err.message } };
+  }
+}
+
+// ---------------- TIME & DATE CONVERSION HELPERS ----------------
+// Convert datetime-local string (YYYY-MM-DDTHH:MM) to IST epoch ms
+function dtLocalToIstEpoch(dtStr) {
+  if (!dtStr) return null;
+  const parts = dtStr.split('T');
+  if (parts.length < 2) return null;
+  const d = parts[0].split('-').map(Number);
+  const t = parts[1].split(':').map(Number);
+  const y = d[0], m = d[1], day = d[2];
+  const hh = t[0] || 0, mm = t[1] || 0, ss = t[2] || 0;
+  // IST is UTC+05:30. Subtract 5 hours 30 mins to get UTC.
+  return Date.UTC(y, m - 1, day, hh - 5, mm - 30, ss);
+}
+
+// Convert epoch ms to datetime-local string (YYYY-MM-DDTHH:MM) in IST
+function epochToDtLocal(ms) {
+  if (!ms) return '';
+  const d = new Date(ms);
+  // Get time in IST (+05:30)
+  const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+  const ist = new Date(utc + (330 * 60000));
+  const y = ist.getFullYear();
+  const m = String(ist.getMonth() + 1).padStart(2, '0');
+  const day = String(ist.getDate()).padStart(2, '0');
+  const hh = String(ist.getHours()).padStart(2, '0');
+  const mm = String(ist.getMinutes()).padStart(2, '0');
+  return y + '-' + m + '-' + day + 'T' + hh + ':' + mm;
+}
+
+// Combine date string (YYYY-MM-DD) and time string (HH:MM) to IST epoch ms
+function dateAndTimeToIstEpoch(dateStr, timeStr) {
+  if (!dateStr || !timeStr) return null;
+  return dtLocalToIstEpoch(dateStr + 'T' + timeStr);
+}
+
+// Return today's date string (YYYY-MM-DD) in IST
+function getTodayIstDateStr() {
+  const d = new Date();
+  const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+  const ist = new Date(utc + (330 * 60000));
+  const y = ist.getFullYear();
+  const m = String(ist.getMonth() + 1).padStart(2, '0');
+  const day = String(ist.getDate()).padStart(2, '0');
+  return y + '-' + m + '-' + day;
+}
+
+// Return current time string (HH:MM) in IST
+function getCurrentIstTimeStr() {
+  const d = new Date();
+  const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+  const ist = new Date(utc + (330 * 60000));
+  const hh = String(ist.getHours()).padStart(2, '0');
+  const mm = String(ist.getMinutes()).padStart(2, '0');
+  return hh + ':' + mm;
+}
+
+function epochToIST(ms) {
+  if (!ms) return '-';
+  try {
+    return new Date(ms).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' });
+  } catch(e) {
+    return String(ms);
+  }
+}
+
+function statusBadge(s) {
+  const map = {
+    'PRESENT': 'badge-present',
+    'ABSENT': 'badge-absent',
+    'LEAVE': 'badge-leave',
+    'WFH': 'badge-wfh',
+    'ON_DUTY': 'badge-duty',
+    'Half Day': 'badge-leave'
+  };
+  return '<span class="badge ' + (map[s] || 'badge-absent') + '">' + (s || '-') + '</span>';
+}
+
+// Feedback rendering
+function showFeedback(elId, ok, msg) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  el.innerHTML = '<div class="alert ' + (ok ? 'alert-success' : 'alert-error') + '">' + (ok ? '&#10003; ' : '&#9888; ') + msg + '</div>';
+  setTimeout(() => { if (el) el.innerHTML = ''; }, 7000);
+}
+
+// Health check
+async function checkHealth() {
+  const r = await api('/health');
+  const dot = document.getElementById('api-dot');
+  const text = document.getElementById('api-badge-text');
+  const statDb = document.getElementById('stat-db');
+  const badgeDb = document.getElementById('badge-db-status');
+
+  if (r.ok && r.body?.status === 'ok') {
+    if (dot) dot.style.background = 'var(--green-light)';
+    if (text) text.textContent = 'API Online (DB: ok)';
+    if (statDb) statDb.textContent = 'ok';
+    if (badgeDb) badgeDb.textContent = 'Connected';
+  } else {
+    if (dot) dot.style.background = 'var(--rose-light)';
+    if (text) text.textContent = 'Database Offline';
+    if (statDb) statDb.textContent = 'down';
+    if (badgeDb) badgeDb.textContent = 'Error';
+  }
+}
+
+// ---------------- LOAD DATA & POPULATE DROPDOWNS ----------------
+async function loadAllMetadata() {
+  const r = await api('/employees?page_size=100');
+  if (r.ok && r.body?.items) {
+    cachedEmployees = r.body.items;
+    cachedDepartments = [...new Set(cachedEmployees.map(e => e.department))].sort();
+
+    // 1. Populate Department Selectors
+    ['dash-dept-sel', 'emp-dept-filter', 'ds-dept', 'tr-dept', 'lb-dept'].forEach(selId => {
+      const el = document.getElementById(selId);
+      if (!el) return;
+      const cur = el.value;
+      const isFilter = (selId === 'emp-dept-filter' || selId === 'ds-dept' || selId === 'lb-dept');
+      let opts = isFilter ? '<option value="">All Departments</option>' : '';
+      cachedDepartments.forEach(d => {
+        opts += '<option value="' + d + '">' + d + '</option>';
+      });
+      el.innerHTML = opts;
+      if (cur) el.value = cur;
+    });
+
+    // 2. Populate Employee Selectors
+    populateEmployeeDropdowns();
+  }
+}
+
+function populateEmployeeDropdowns() {
+  const employeeSelectors = [
+    { id: 'pi-emp', defaultText: 'Select Employee...' },
+    { id: 'po-emp', defaultText: 'Select Employee...' },
+    { id: 'reg-emp', defaultText: 'Select Employee...' },
+    { id: 'm-emp', defaultText: 'Select Employee...' },
+    { id: 'att-filter-emp', defaultText: 'All Employees' },
+  ];
+
+  employeeSelectors.forEach(cfg => {
+    const el = document.getElementById(cfg.id);
+    if (!el) return;
+    const curVal = el.value;
+    let opts = cfg.defaultText ? '<option value="">' + cfg.defaultText + '</option>' : '';
+    cachedEmployees.forEach(e => {
+      opts += '<option value="' + e.emp_code + '">' + e.emp_code + ' - ' + e.name + ' (' + e.department + ')</option>';
+    });
+    el.innerHTML = opts;
+    if (curVal) el.value = curVal;
+  });
+
+  // Default first employee for Punch In & Punch Out
+  if (cachedEmployees.length > 0) {
+    const piEmp = document.getElementById('pi-emp');
+    if (piEmp && !piEmp.value) {
+      piEmp.value = cachedEmployees[0].emp_code;
+      onPunchInEmpChange();
+    }
+    const poEmp = document.getElementById('po-emp');
+    if (poEmp && !poEmp.value) {
+      poEmp.value = cachedEmployees[0].emp_code;
+      onPunchOutEmpChange();
+    }
+    const regEmp = document.getElementById('reg-emp');
+    if (regEmp && !regEmp.value) {
+      regEmp.value = cachedEmployees[0].emp_code;
+    }
+    const mEmp = document.getElementById('m-emp');
+    if (mEmp && !mEmp.value) {
+      mEmp.value = cachedEmployees[0].emp_code;
+    }
+  }
+}
+
+// ---------------- DASHBOARD ----------------
+async function loadDashboard() {
+  checkHealth();
+  await loadAllMetadata();
+
+  // Employee count
+  api('/employees?page_size=1').then(r => {
+    if (r.ok && r.body) {
+      document.getElementById('stat-emp').textContent = r.body.total ?? '-';
+      document.getElementById('badge-emp-total').textContent = (r.body.total ?? 0) + ' Total';
+    }
+  });
+
+  // Attendance total
+  api('/attendance?page_size=1').then(r => {
+    if (r.ok && r.body) {
+      document.getElementById('stat-logs').textContent = r.body.total ?? '-';
+    }
+  });
+
+  // Late leaderboard count
+  api('/analytics/leaderboard/late?month=' + DEFAULT_MONTH + '&limit=50').then(r => {
+    const items = r.body?.items || [];
+    document.getElementById('stat-late').textContent = items.length;
+    renderDashboardLeaderboard(items.slice(0, 4));
+  });
+
+  // Recent attendance
+  api('/attendance?page_size=8').then(r => {
+    const tbody = document.getElementById('dash-recent-body');
+    const items = r.body?.items || [];
+    if (!items.length) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text-muted)">No attendance records found.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = items.map(l => (
+      '<tr>' +
+        '<td><strong class="font-mono" style="color:var(--teal-light)">' + l.emp_code + '</strong></td>' +
+        '<td>' + l.date + '</td>' +
+        '<td class="font-mono">' + epochToIST(l.punch_in) + '</td>' +
+        '<td class="font-mono">' + epochToIST(l.punch_out) + '</td>' +
+        '<td>' + (l.work_hours != null ? l.work_hours + 'h' : '-') + '</td>' +
+        '<td>' + statusBadge(l.status) + '</td>' +
+        '<td>' + (l.late_minutes ? '<span style="color:var(--rose-light)">' + l.late_minutes + 'm</span>' : '0') + '</td>' +
+        '<td>' + (l.overtime_minutes ? '<span style="color:var(--purple-light)">' + l.overtime_minutes + 'm</span>' : '0') + '</td>' +
+      '</tr>'
+    )).join('');
+  });
+
+  // Dashboard trend chart
+  loadDashboardTrend();
+}
+
+async function loadDashboardTrend() {
+  const sel = document.getElementById('dash-dept-sel');
+  const dept = sel ? sel.value : (cachedDepartments[0] || 'Sales');
+  if (!dept) return;
+
+  const r = await api('/analytics/departments/' + encodeURIComponent(dept) + '/trend?from=2026-07-01&to=2026-07-15');
+  const items = r.body?.items || [];
+  renderBars('dash-chart-bars', 'dash-chart-labels', items);
+}
+
+function renderBars(barsId, labelsId, items) {
+  const barsEl = document.getElementById(barsId);
+  const labelsEl = document.getElementById(labelsId);
+  if (!barsEl) return;
+
+  if (!items.length) {
+    barsEl.innerHTML = '<div class="empty-state" style="width:100%"><p>No trend data available.</p></div>';
+    if (labelsEl) labelsEl.innerHTML = '';
+    return;
+  }
+
+  const maxVal = Math.max(...items.map(i => Math.max(i.present_count || 0, i.late_count || 0)), 1);
+
+  barsEl.innerHTML = items.map(item => {
+    const pH = Math.max(Math.round(((item.present_count || 0) / maxVal) * 110), 3);
+    const lH = Math.max(Math.round(((item.late_count || 0) / maxVal) * 110), (item.late_count ? 4 : 0));
+    const tip = item.date + ' (' + (item.is_working_day ? 'Workday' : 'Weekend') + ')\nPresent: ' + item.present_count + ' | Late: ' + item.late_count + ' | Rate: ' + (item.attendance_rate != null ? (item.attendance_rate * 100).toFixed(0) + '%' : 'N/A');
+
+    return (
+      '<div class="bar-group">' +
+        '<div class="bar-tooltip">' + tip.replace(/\n/g, '<br/>') + '</div>' +
+        '<div style="display:flex;gap:3px;align-items:flex-end;width:100%;justify-content:center;">' +
+          '<div class="bar-col bar-present" style="height:' + pH + 'px"></div>' +
+          (lH > 0 ? '<div class="bar-col bar-late" style="height:' + lH + 'px"></div>' : '') +
+        '</div>' +
+      '</div>'
+    );
+  }).join('');
+
+  if (labelsEl) {
+    const step = Math.ceil(items.length / 5);
+    labelsEl.innerHTML = items.filter((_, idx) => idx % step === 0 || idx === items.length - 1).map(i => (
+      '<span>' + i.date.slice(5) + '</span>'
+    )).join('');
+  }
+}
+
+function renderDashboardLeaderboard(items) {
+  const el = document.getElementById('dash-lb-list');
+  if (!el) return;
+  if (!items.length) {
+    el.innerHTML = '<div class="empty-state"><p>No late arrivals recorded this month.</p></div>';
+    return;
+  }
+
+  el.innerHTML = items.map(i => {
+    const cls = i.rank === 1 ? 'gold' : i.rank === 2 ? 'silver' : i.rank === 3 ? 'bronze' : 'other';
+    return (
+      '<div class="lb-row">' +
+        '<div class="lb-left">' +
+          '<div class="lb-rank ' + cls + '">' + i.rank + '</div>' +
+          '<div>' +
+            '<div class="lb-name">' + (i.name || i.emp_code) + '</div>' +
+            '<div class="lb-sub font-mono">' + i.emp_code + ' &middot; ' + i.department + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="lb-right">' +
+          '<div class="lb-minutes">' + i.total_late_minutes + ' min</div>' +
+          '<div class="lb-days">' + i.late_count + ' day' + (i.late_count === 1 ? '' : 's') + ' late</div>' +
+        '</div>' +
+      '</div>'
+    );
+  }).join('');
+}
+
+// ---------------- EMPLOYEES ----------------
+async function loadEmployees(page = 1) {
+  const dept = document.getElementById('emp-dept-filter')?.value || '';
+  let url = '/employees?page=' + page + '&page_size=15';
+  if (dept) url += '&department=' + encodeURIComponent(dept);
+
+  const tbody = document.getElementById('emp-table-body');
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;"><span class="spinner"></span></td></tr>';
+
+  const r = await api(url);
+  if (!r.ok || !r.body) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--rose-light)">Error loading employees: ' + r.status + '</td></tr>';
+    return;
+  }
+
+  const items = r.body.items || [];
+  const total = r.body.total || 0;
+
+  if (!items.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted)">No employees found.</td></tr>';
+  } else {
+    tbody.innerHTML = items.map(e => (
+      '<tr>' +
+        '<td><strong class="font-mono" style="color:var(--teal-light)">' + e.emp_code + '</strong></td>' +
+        '<td style="color:#fff;font-weight:600">' + e.name + '</td>' +
+        '<td>' + e.email + '</td>' +
+        '<td><span class="badge" style="background:rgba(96,165,250,0.12);color:var(--blue-light)">' + e.department + '</span></td>' +
+        '<td class="font-mono">' + e.shift_start + ' - ' + e.shift_end + '</td>' +
+        '<td>' + e.joined_on + '</td>' +
+      '</tr>'
+    )).join('');
+  }
+
+  renderPagination('emp-pg-info', 'emp-pg-btns', page, total, 15, 'loadEmployees');
+}
+
+function openAddEmployeeModal() {
+  document.getElementById('modal-add-emp').classList.add('open');
+}
+
+function closeAddEmployeeModal() {
+  document.getElementById('modal-add-emp').classList.remove('open');
+}
+
+async function submitCreateEmployee() {
+  const code = document.getElementById('ae-code').value.trim();
+  const name = document.getElementById('ae-name').value.trim();
+  const email = document.getElementById('ae-email').value.trim();
+  const dept = document.getElementById('ae-dept').value.trim();
+  const shift_s = document.getElementById('ae-shift-s').value.trim() || '09:30';
+  const shift_e = document.getElementById('ae-shift-e').value.trim() || '18:30';
+  const joined = document.getElementById('ae-joined').value.trim();
+
+  if (!code || !name || !email || !dept || !joined) {
+    showFeedback('ae-feedback', false, 'Please fill in all required fields.');
+    return;
+  }
+
+  const payload = {
+    emp_code: code,
+    name: name,
+    email: email,
+    department: dept,
+    shift_start: shift_s,
+    shift_end: shift_e,
+    joined_on: joined
+  };
+
+  const r = await api('/employees', { method: 'POST', body: JSON.stringify(payload) });
+  if (r.ok) {
+    showFeedback('ae-feedback', true, 'Employee created successfully!');
+    setTimeout(() => {
+      closeAddEmployeeModal();
+      loadAllMetadata();
+      loadEmployees(1);
+    }, 1000);
+  } else {
+    showFeedback('ae-feedback', false, 'Error ' + r.status + ': ' + JSON.stringify(r.body));
+  }
+}
+
+// ---------------- ATTENDANCE ----------------
+async function loadAttendance(page = 1) {
+  const emp = document.getElementById('att-filter-emp')?.value || '';
+  const status = document.getElementById('att-filter-status')?.value || '';
+  const from = document.getElementById('att-filter-from')?.value || '';
+  const to = document.getElementById('att-filter-to')?.value || '';
+
+  let url = '/attendance?page=' + page + '&page_size=15';
+  if (emp) url += '&emp_code=' + encodeURIComponent(emp);
+  if (status) url += '&status=' + encodeURIComponent(status);
+  if (from) url += '&date_from=' + from;
+  if (to) url += '&date_to=' + to;
+
+  const tbody = document.getElementById('att-table-body');
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;"><span class="spinner"></span></td></tr>';
+
+  const r = await api(url);
+  if (!r.ok || !r.body) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--rose-light)">Error ' + r.status + ': ' + JSON.stringify(r.body) + '</td></tr>';
+    return;
+  }
+
+  const items = r.body.items || [];
+  const total = r.body.total || 0;
+
+  if (!items.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text-muted)">No attendance records found matching filters.</td></tr>';
+  } else {
+    tbody.innerHTML = items.map(l => (
+      '<tr>' +
+        '<td><strong class="font-mono" style="color:var(--teal-light)">' + l.emp_code + '</strong></td>' +
+        '<td>' + l.date + '</td>' +
+        '<td class="font-mono">' + epochToIST(l.punch_in) + '</td>' +
+        '<td class="font-mono">' + epochToIST(l.punch_out) + '</td>' +
+        '<td>' + (l.work_hours != null ? l.work_hours + 'h' : '-') + '</td>' +
+        '<td>' + statusBadge(l.status) + '</td>' +
+        '<td>' + (l.late_minutes ? '<span style="color:var(--rose-light)">' + l.late_minutes + 'm</span>' : '0') + '</td>' +
+        '<td>' + (l.overtime_minutes ? '<span style="color:var(--purple-light)">' + l.overtime_minutes + 'm</span>' : '0') + '</td>' +
+      '</tr>'
+    )).join('');
+  }
+
+  renderPagination('att-pg-info', 'att-pg-btns', page, total, 15, 'loadAttendance');
+}
+
+function clearAttendanceFilters() {
+  document.getElementById('att-filter-emp').value = '';
+  document.getElementById('att-filter-status').value = '';
+  document.getElementById('att-filter-from').value = '2026-07-01';
+  document.getElementById('att-filter-to').value = '2026-07-15';
+  loadAttendance(1);
+}
+
+// ---------------- PUNCH IN / OUT TIME CONTROLS ----------------
+function initPunchPage() {
+  if (cachedEmployees.length === 0) {
+    loadAllMetadata();
+  }
+  setPunchInPreset('shift_start');
+  setPunchOutPreset('shift_end');
+}
+
+function onPunchInEmpChange() {
+  const code = document.getElementById('pi-emp').value;
+  const emp = cachedEmployees.find(e => e.emp_code === code);
+  const badge = document.getElementById('pi-shift-badge');
+  if (badge) {
+    badge.textContent = emp ? ('Shift: ' + emp.shift_start + ' - ' + emp.shift_end) : '';
+  }
+  const timeInput = document.getElementById('pi-time');
+  if (timeInput && !timeInput.value) {
+    setPunchInPreset('shift_start');
+  }
+}
+
+function onPunchOutEmpChange() {
+  const code = document.getElementById('po-emp').value;
+  const emp = cachedEmployees.find(e => e.emp_code === code);
+  const badge = document.getElementById('po-shift-badge');
+  if (badge) {
+    badge.textContent = emp ? ('Shift: ' + emp.shift_start + ' - ' + emp.shift_end) : '';
+  }
+  const timeInput = document.getElementById('po-time');
+  if (timeInput && !timeInput.value) {
+    setPunchOutPreset('shift_end');
+  }
+}
+
+function onPunchInTimeChange() {
+  const timeVal = document.getElementById('pi-time')?.value;
+  const today = getTodayIstDateStr();
+  const hint = document.getElementById('pi-epoch-hint');
+  if (timeVal) {
+    const epoch = dateAndTimeToIstEpoch(today, timeVal);
+    if (hint) hint.textContent = 'Today (' + today + ')' + (epoch ? ' • Epoch: ' + epoch + ' ms' : '');
+  } else {
+    if (hint) hint.textContent = 'Date: Today (' + today + ')';
+  }
+}
+
+function onPunchOutTimeChange() {
+  const timeVal = document.getElementById('po-time')?.value;
+  const today = getTodayIstDateStr();
+  const hint = document.getElementById('po-epoch-hint');
+  if (timeVal) {
+    const epoch = dateAndTimeToIstEpoch(today, timeVal);
+    if (hint) hint.textContent = 'Today (' + today + ')' + (epoch ? ' • Epoch: ' + epoch + ' ms' : '');
+  } else {
+    if (hint) hint.textContent = 'Date: Today (' + today + ')';
+  }
+}
+
+function setPunchInPreset(mode) {
+  const timeInput = document.getElementById('pi-time');
+  if (!timeInput) return;
+  const code = document.getElementById('pi-emp').value;
+  const emp = cachedEmployees.find(e => e.emp_code === code);
+  const shiftStart = emp?.shift_start || '09:30';
+
+  if (mode === 'now') {
+    timeInput.value = getCurrentIstTimeStr();
+  } else if (mode === 'shift_start') {
+    timeInput.value = shiftStart;
+  } else if (mode === 'sample_late') {
+    timeInput.value = '10:15';
+  } else if (mode === 'early') {
+    timeInput.value = '09:00';
+  }
+  onPunchInTimeChange();
+}
+
+function onPunchOutModeChange() {
+  const mode = document.getElementById('po-mode')?.value;
+  if (mode === 'HALF_DAY') {
+    setPunchOutPreset('half_day');
+  } else if (mode === 'OVERTIME') {
+    setPunchOutPreset('sample_ot');
+  } else {
+    setPunchOutPreset('shift_end');
+  }
+}
+
+function setPunchOutPreset(mode) {
+  const timeInput = document.getElementById('po-time');
+  if (!timeInput) return;
+  const code = document.getElementById('po-emp').value;
+  const emp = cachedEmployees.find(e => e.emp_code === code);
+  const shiftEnd = emp?.shift_end || '18:30';
+
+  if (mode === 'now') {
+    timeInput.value = getCurrentIstTimeStr();
+  } else if (mode === 'shift_end') {
+    timeInput.value = shiftEnd;
+  } else if (mode === 'half_day') {
+    timeInput.value = '13:30';
+  } else if (mode === 'sample_ot') {
+    timeInput.value = '19:45';
+  }
+  onPunchOutTimeChange();
+}
+
+function onRegDateChange() {
+  const d = document.getElementById('reg-date').value;
+  const inTime = document.getElementById('reg-in-time').value;
+  const outTime = document.getElementById('reg-out-time').value;
+  if (d && inTime) {
+    const ep = dateAndTimeToIstEpoch(d, inTime);
+    document.getElementById('reg-in-hint').textContent = ep ? (ep + ' ms') : '';
+  }
+  if (d && outTime) {
+    const ep = dateAndTimeToIstEpoch(d, outTime);
+    document.getElementById('reg-out-hint').textContent = ep ? (ep + ' ms') : '';
+  }
+}
+
+async function submitPunchIn() {
+  const emp = document.getElementById('pi-emp').value;
+  const status = document.getElementById('pi-status').value;
+  const timeVal = document.getElementById('pi-time')?.value;
+
+  if (!emp) {
+    showFeedback('pi-feedback', false, 'Please select an employee.');
+    return;
+  }
+
+  const payload = { emp_code: emp, status: status };
+  const today = getTodayIstDateStr();
+  if (timeVal) {
+    payload.punched_at = dateAndTimeToIstEpoch(today, timeVal);
+  }
+
+  const r = await api('/attendance/punch-in', { method: 'POST', body: JSON.stringify(payload) });
+  if (r.ok) {
+    showFeedback('pi-feedback', true, 'Punch-in recorded for ' + emp + ' today at ' + (timeVal || 'Current Time') + '! Status: ' + (r.body?.status || status));
+  } else {
+    showFeedback('pi-feedback', false, 'Error ' + r.status + ': ' + (r.body?.detail || JSON.stringify(r.body)));
+  }
+}
+
+async function submitPunchOut() {
+  const emp = document.getElementById('po-emp').value;
+  const timeVal = document.getElementById('po-time')?.value;
+
+  if (!emp) {
+    showFeedback('po-feedback', false, 'Please select an employee.');
+    return;
+  }
+
+  const payload = { emp_code: emp };
+  const today = getTodayIstDateStr();
+  if (timeVal) {
+    payload.punched_at = dateAndTimeToIstEpoch(today, timeVal);
+  }
+
+  const r = await api('/attendance/punch-out', { method: 'POST', body: JSON.stringify(payload) });
+  if (r.ok) {
+    showFeedback('po-feedback', true, 'Punch-out recorded for ' + emp + ' today at ' + (timeVal || 'Current Time') + '! Work Hours: ' + (r.body?.work_hours ?? '-') + 'h | Overtime: ' + (r.body?.overtime_minutes ?? 0) + 'm');
+  } else {
+    showFeedback('po-feedback', false, 'Error ' + r.status + ': ' + (r.body?.detail || JSON.stringify(r.body)));
+  }
+}
+
+async function submitRegularization() {
+  const emp = document.getElementById('reg-emp').value;
+  const date = document.getElementById('reg-date').value.trim();
+  const status = document.getElementById('reg-status').value;
+  const inTime = document.getElementById('reg-in-time').value;
+  const outTime = document.getElementById('reg-out-time').value;
+  const reason = document.getElementById('reg-reason').value.trim();
+  const regBy = document.getElementById('reg-by').value.trim();
+
+  if (!emp || !date || !reason || !regBy) {
+    showFeedback('reg-feedback', false, 'Employee, date, regularized_by, and reason (min 5 chars) are required.');
+    return;
+  }
+
+  const payload = { reason: reason, regularized_by: regBy };
+  if (status) payload.status = status;
+  if (inTime) payload.punch_in = dateAndTimeToIstEpoch(date, inTime);
+  if (outTime) payload.punch_out = dateAndTimeToIstEpoch(date, outTime);
+
+  const r = await api('/attendance/' + encodeURIComponent(emp) + '/' + date, {
+    method: 'PATCH',
+    body: JSON.stringify(payload)
+  });
+
+  if (r.ok) {
+    showFeedback('reg-feedback', true, 'Record regularized successfully for ' + emp + ' on ' + date + '!');
+  } else {
+    showFeedback('reg-feedback', false, 'Error ' + r.status + ': ' + (r.body?.detail || JSON.stringify(r.body)));
+  }
+}
+
+// ---------------- MONTHLY ANALYTICS ----------------
+function initMonthlyPage() {
+  if (cachedEmployees.length === 0) {
+    loadAllMetadata().then(loadMonthlyAnalytics);
+  } else {
+    loadMonthlyAnalytics();
+  }
+}
+
+async function loadMonthlyAnalytics() {
+  const emp = document.getElementById('m-emp').value || (cachedEmployees[0]?.emp_code || 'EMP0001');
+  const month = document.getElementById('m-month').value.trim() || DEFAULT_MONTH;
+  const wrap = document.getElementById('monthly-content');
+
+  if (!emp || !month) {
+    wrap.innerHTML = '<div class="alert alert-error">Please select an employee and month.</div>';
+    return;
+  }
+
+  // Ensure select is synced
+  document.getElementById('m-emp').value = emp;
+
+  wrap.innerHTML = '<div class="empty-state"><span class="spinner"></span></div>';
+
+  const r = await api('/analytics/employees/' + encodeURIComponent(emp) + '/monthly?month=' + month);
+  if (!r.ok || !r.body) {
+    wrap.innerHTML = '<div class="alert alert-error">Error ' + r.status + ': ' + (r.body?.detail || JSON.stringify(r.body)) + '</div>';
+    return;
+  }
+
+  const d = r.body;
+  const empInfo = cachedEmployees.find(e => e.emp_code === emp);
+
+  wrap.innerHTML = (
+    '<div style="margin-bottom:14px;padding:12px 16px;background:rgba(11,19,34,0.5);border:1px solid var(--border);border-radius:var(--radius-sm);display:flex;justify-content:space-between;align-items:center;">' +
+      '<div>' +
+        '<span style="font-size:15px;font-weight:700;color:#fff;">' + (empInfo ? empInfo.name : emp) + '</span>' +
+        '<span class="font-mono" style="color:var(--teal-light);margin-left:8px;">(' + emp + ')</span>' +
+        '<span style="color:var(--text-muted);margin-left:12px;">' + (empInfo ? empInfo.department : '') + ' &middot; Shift ' + (empInfo ? empInfo.shift_start + ' - ' + empInfo.shift_end : '') + '</span>' +
+      '</div>' +
+      '<span class="badge badge-present">' + month + '</span>' +
+    '</div>' +
+    '<div class="stats-row" style="margin-bottom:20px;">' +
+      '<div class="stat-card teal"><div class="stat-top"><div class="stat-icon">&#128197;</div></div><div class="stat-num">' + (d.working_days ?? '-') + '</div><div class="stat-desc">Working Days</div></div>' +
+      '<div class="stat-card purple"><div class="stat-top"><div class="stat-icon">&#10003;</div></div><div class="stat-num">' + (d.present_days ?? '-') + '</div><div class="stat-desc">Present Days</div></div>' +
+      '<div class="stat-card amber"><div class="stat-top"><div class="stat-icon">&#128683;</div></div><div class="stat-num">' + (d.leave_days ?? '-') + '</div><div class="stat-desc">Leave Days</div></div>' +
+      '<div class="stat-card rose"><div class="stat-top"><div class="stat-icon">&#9888;</div></div><div class="stat-num">' + (d.late_count ?? '-') + '</div><div class="stat-desc">Late Count</div></div>' +
+    '</div>' +
+    '<div class="stats-row">' +
+      '<div class="stat-card teal"><div class="stat-top"><div class="stat-icon">%</div></div><div class="stat-num">' + (d.attendance_pct != null ? d.attendance_pct + '%' : 'N/A') + '</div><div class="stat-desc">Attendance Rate</div></div>' +
+      '<div class="stat-card rose"><div class="stat-top"><div class="stat-icon">&#9201;</div></div><div class="stat-num">' + (d.total_late_minutes ?? '-') + 'm</div><div class="stat-desc">Total Late Minutes</div></div>' +
+      '<div class="stat-card purple"><div class="stat-top"><div class="stat-icon">&#128188;</div></div><div class="stat-num">' + (d.total_overtime_minutes ?? '-') + 'm</div><div class="stat-desc">Total Overtime Minutes</div></div>' +
+    '</div>'
+  );
+}
+
+// ---------------- DEPARTMENT SUMMARY ----------------
+async function loadDepartmentSummary() {
+  const month = document.getElementById('ds-month').value.trim();
+  const dept = document.getElementById('ds-dept').value.trim();
+  const tbody = document.getElementById('ds-table-body');
+
+  if (!month) return;
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;"><span class="spinner"></span></td></tr>';
+
+  let url = '/analytics/departments/summary?month=' + month;
+  if (dept) url += '&department=' + encodeURIComponent(dept);
+
+  const r = await api(url);
+  if (!r.ok || !r.body) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--rose-light)">Error ' + r.status + ': ' + JSON.stringify(r.body) + '</td></tr>';
+    return;
+  }
+
+  const items = r.body.items || [];
+  if (!items.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text-muted)">No departments found for ' + month + '.</td></tr>';
+  } else {
+    tbody.innerHTML = items.map(d => (
+      '<tr>' +
+        '<td><strong style="color:#fff;">' + d.department + '</strong></td>' +
+        '<td>' + d.headcount + '</td>' +
+        '<td>' + d.present_days + '</td>' +
+        '<td>' + (d.avg_work_hours != null ? d.avg_work_hours + 'h' : '-') + '</td>' +
+        '<td>' + d.late_count + '</td>' +
+        '<td><span style="color:var(--rose-light)">' + d.total_late_minutes + 'm</span></td>' +
+        '<td>' + d.leave_count + '</td>' +
+        '<td>' + d.on_duty_count + '</td>' +
+      '</tr>'
+    )).join('');
+  }
+}
+
+// ---------------- DEPARTMENT TREND ----------------
+async function loadTrendPage() {
+  const dept = document.getElementById('tr-dept').value || (cachedDepartments[0] || 'Sales');
+  const from = document.getElementById('tr-from').value;
+  const to = document.getElementById('tr-to').value;
+
+  if (!dept || !from || !to) return;
+
+  const tbody = document.getElementById('tr-table-body');
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;"><span class="spinner"></span></td></tr>';
+
+  const r = await api('/analytics/departments/' + encodeURIComponent(dept) + '/trend?from=' + from + '&to=' + to);
+  if (!r.ok || !r.body) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--rose-light)">Error ' + r.status + ': ' + (r.body?.detail || JSON.stringify(r.body)) + '</td></tr>';
+    return;
+  }
+
+  const items = r.body.items || [];
+  renderBars('tr-chart-bars', 'tr-chart-labels', items);
+
+  if (!items.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted)">No data points in range.</td></tr>';
+  } else {
+    tbody.innerHTML = items.map(i => (
+      '<tr>' +
+        '<td><strong class="font-mono">' + i.date + '</strong></td>' +
+        '<td>' + (i.is_working_day ? '<span class="badge" style="background:rgba(45,212,191,0.12);color:var(--teal-light)">Workday</span>' : '<span class="badge" style="background:rgba(148,163,184,0.1);color:var(--text-muted)">Weekend</span>') + '</td>' +
+        '<td>' + i.headcount + '</td>' +
+        '<td>' + i.present_count + '</td>' +
+        '<td>' + (i.late_count ? '<span style="color:var(--amber-light)">' + i.late_count + '</span>' : '0') + '</td>' +
+        '<td>' + (i.attendance_rate != null ? (i.attendance_rate * 100).toFixed(1) + '%' : '-') + '</td>' +
+        '<td>' + (i.moving_avg_7d != null ? (i.moving_avg_7d * 100).toFixed(1) + '%' : '-') + '</td>' +
+      '</tr>'
+    )).join('');
+  }
+}
+
+// ---------------- LATE LEADERBOARD ----------------
+async function loadLeaderboardPage() {
+  const month = document.getElementById('lb-month').value.trim();
+  const dept = document.getElementById('lb-dept').value.trim();
+  const limit = document.getElementById('lb-limit').value || 10;
+  const listEl = document.getElementById('lb-full-list');
+
+  listEl.innerHTML = '<div class="empty-state"><span class="spinner"></span></div>';
+
+  let url = '/analytics/leaderboard/late?month=' + month + '&limit=' + limit;
+  if (dept) url += '&department=' + encodeURIComponent(dept);
+
+  const r = await api(url);
+  if (!r.ok || !r.body) {
+    listEl.innerHTML = '<div class="alert alert-error">Error ' + r.status + ': ' + JSON.stringify(r.body) + '</div>';
+    return;
+  }
+
+  const items = r.body.items || [];
+  if (!items.length) {
+    listEl.innerHTML = '<div class="empty-state"><p>No employees arrived late in ' + month + (dept ? ' for ' + dept : '') + '.</p></div>';
+  } else {
+    listEl.innerHTML = items.map(i => {
+      const cls = i.rank === 1 ? 'gold' : i.rank === 2 ? 'silver' : i.rank === 3 ? 'bronze' : 'other';
+      return (
+        '<div class="lb-row">' +
+          '<div class="lb-left">' +
+            '<div class="lb-rank ' + cls + '">' + i.rank + '</div>' +
+            '<div>' +
+              '<div class="lb-name" style="font-size:14px;">' + (i.name || i.emp_code) + '</div>' +
+              '<div class="lb-sub font-mono">' + i.emp_code + ' &middot; ' + i.department + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="lb-right">' +
+            '<div class="lb-minutes" style="font-size:17px;">' + i.total_late_minutes + ' min</div>' +
+            '<div class="lb-days">' + i.late_count + ' day' + (i.late_count === 1 ? '' : 's') + ' late</div>' +
+          '</div>' +
+        '</div>'
+      );
+    }).join('');
+  }
+}
+
+// ---------------- API EXPLORER ----------------
+const API_ENDPOINTS = [
+  { method: 'GET', path: '/health', desc: 'System health check' },
+  { method: 'GET', path: '/employees', desc: 'List employees with pagination', params: [{ name: 'page', default: '1' }, { name: 'page_size', default: '20' }, { name: 'department', default: '' }] },
+  { method: 'POST', path: '/employees', desc: 'Create new employee record', body: JSON.stringify({ emp_code: 'EMP0007', name: 'Dev Sharma', email: 'dev@example.com', department: 'Engineering', shift_start: '09:30', shift_end: '18:30', joined_on: '2026-07-01' }, null, 2) },
+  { method: 'GET', path: '/attendance', desc: 'Query attendance records', params: [{ name: 'page', default: '1' }, { name: 'page_size', default: '20' }, { name: 'emp_code', default: 'EMP0001' }, { name: 'status', default: '' }, { name: 'date_from', default: '2026-07-01' }, { name: 'date_to', default: '2026-07-15' }] },
+  { method: 'POST', path: '/attendance/punch-in', desc: 'Record punch-in', body: JSON.stringify({ emp_code: 'EMP0001', status: 'PRESENT' }, null, 2) },
+  { method: 'POST', path: '/attendance/punch-out', desc: 'Record punch-out', body: JSON.stringify({ emp_code: 'EMP0001' }, null, 2) },
+  { method: 'PATCH', path: '/attendance/{emp_code}/{date}', desc: 'Regularize attendance', pathParams: ['emp_code', 'date'], defaultPath: { emp_code: 'EMP0001', date: '2026-07-06' }, body: JSON.stringify({ status: 'PRESENT', reason: 'Badge scanner maintenance', regularized_by: 'Admin' }, null, 2) },
+  { method: 'GET', path: '/analytics/employees/{emp_code}/monthly', desc: 'Employee monthly stats', pathParams: ['emp_code'], defaultPath: { emp_code: 'EMP0001' }, params: [{ name: 'month', default: '2026-07' }] },
+  { method: 'GET', path: '/analytics/departments/summary', desc: 'Department summary', params: [{ name: 'month', default: '2026-07' }, { name: 'department', default: '' }] },
+  { method: 'GET', path: '/analytics/departments/{department}/trend', desc: 'Daily department trend', pathParams: ['department'], defaultPath: { department: 'Engineering' }, params: [{ name: 'from', default: '2026-07-01' }, { name: 'to', default: '2026-07-15' }] },
+  { method: 'GET', path: '/analytics/leaderboard/late', desc: 'Late arrival leaderboard', params: [{ name: 'month', default: '2026-07' }, { name: 'limit', default: '10' }, { name: 'department', default: '' }] },
+  { method: 'GET', path: '/admin/explain/{endpoint}', desc: 'Run MongoDB execution explain', pathParams: ['endpoint'], defaultPath: { endpoint: 'department_summary' }, params: [{ name: 'month', default: '2026-07' }] }
+];
+
+let selectedEp = null;
+
+function initExplorer() {
+  const list = document.getElementById('explorer-ep-list');
+  list.innerHTML = API_ENDPOINTS.map((ep, idx) => (
+    '<div class="ep-item ' + (selectedEp === ep ? 'active' : '') + '" onclick="selectEndpoint(' + idx + ')">' +
+      '<span class="method-tag method-' + ep.method.toLowerCase() + '">' + ep.method + '</span>' +
+      '<div>' +
+        '<div class="ep-path">' + ep.path + '</div>' +
+        '<div class="ep-desc">' + ep.desc + '</div>' +
+      '</div>' +
+    '</div>'
+  )).join('');
+
+  if (selectedEp === null) selectEndpoint(0);
+}
+
+function selectEndpoint(idx) {
+  selectedEp = API_ENDPOINTS[idx];
+  document.querySelectorAll('.ep-item').forEach((el, i) => el.classList.toggle('active', i === idx));
+  document.getElementById('explorer-cur-title').textContent = selectedEp.method + ' ' + selectedEp.path;
+  document.getElementById('explorer-run-btn').style.display = 'inline-flex';
+
+  const formWrap = document.getElementById('explorer-form-wrap');
+  let formHtml = '';
+
+  if (selectedEp.pathParams) {
+    formHtml += '<div style="margin-bottom:14px;"><div class="form-label" style="margin-bottom:6px;">Path Parameters</div><div class="form-grid">';
+    selectedEp.pathParams.forEach(p => {
+      const def = (selectedEp.defaultPath && selectedEp.defaultPath[p]) || '';
+      if (p === 'emp_code' && cachedEmployees.length > 0) {
+        formHtml += '<div class="form-group"><label class="form-label font-mono">{' + p + '}</label><select class="form-control font-mono" id="ep-path-' + p + '">';
+        cachedEmployees.forEach(e => {
+          formHtml += '<option value="' + e.emp_code + '" ' + (e.emp_code === def ? 'selected' : '') + '>' + e.emp_code + ' - ' + e.name + '</option>';
+        });
+        formHtml += '</select></div>';
+      } else {
+        formHtml += '<div class="form-group"><label class="form-label font-mono">{' + p + '}</label><input class="form-control font-mono" id="ep-path-' + p + '" value="' + def + '" /></div>';
+      }
+    });
+    formHtml += '</div></div>';
+  }
+
+  if (selectedEp.params) {
+    formHtml += '<div style="margin-bottom:14px;"><div class="form-label" style="margin-bottom:6px;">Query Parameters</div><div class="form-grid">';
+    selectedEp.params.forEach(p => {
+      if (p.name === 'emp_code' && cachedEmployees.length > 0) {
+        formHtml += '<div class="form-group"><label class="form-label font-mono">' + p.name + '</label><select class="form-control font-mono" id="ep-qp-' + p.name + '">';
+        formHtml += '<option value="">All</option>';
+        cachedEmployees.forEach(e => {
+          formHtml += '<option value="' + e.emp_code + '" ' + (e.emp_code === p.default ? 'selected' : '') + '>' + e.emp_code + ' - ' + e.name + '</option>';
+        });
+        formHtml += '</select></div>';
+      } else {
+        formHtml += '<div class="form-group"><label class="form-label font-mono">' + p.name + '</label><input class="form-control font-mono" id="ep-qp-' + p.name + '" value="' + (p.default || '') + '" /></div>';
+      }
+    });
+    formHtml += '</div></div>';
+  }
+
+  if (selectedEp.body) {
+    formHtml += '<div class="form-group"><label class="form-label">Request Body (JSON)</label><textarea class="form-control" id="ep-body" rows="6">' + selectedEp.body + '</textarea></div>';
+  }
+
+  if (!formHtml) formHtml = '<div class="alert alert-info">This endpoint does not require any parameters.</div>';
+  formWrap.innerHTML = formHtml;
+  document.getElementById('explorer-resp-wrap').style.display = 'none';
+}
+
+async function runExplorerQuery() {
+  if (!selectedEp) return;
+  let path = selectedEp.path;
+
+  if (selectedEp.pathParams) {
+    selectedEp.pathParams.forEach(p => {
+      const val = document.getElementById('ep-path-' + p)?.value || '';
+      path = path.replace('{' + p + '}', encodeURIComponent(val));
+    });
+  }
+
+  if (selectedEp.params) {
+    const qp = [];
+    selectedEp.params.forEach(p => {
+      const val = document.getElementById('ep-qp-' + p.name)?.value || '';
+      if (val) qp.push(p.name + '=' + encodeURIComponent(val));
+    });
+    if (qp.length) path += '?' + qp.join('&');
+  }
+
+  const opts = { method: selectedEp.method };
+  if (selectedEp.body) {
+    const bodyText = document.getElementById('ep-body')?.value || '';
+    opts.body = bodyText;
+  }
+
+  const badge = document.getElementById('explorer-status-badge');
+  const box = document.getElementById('explorer-resp-box');
+  const wrap = document.getElementById('explorer-resp-wrap');
+
+  wrap.style.display = 'block';
+  badge.textContent = 'Executing...';
+  badge.className = 'badge';
+  box.textContent = 'Waiting for API response...';
+
+  const t0 = performance.now();
+  const r = await api(path, opts);
+  const dur = Math.round(performance.now() - t0);
+
+  badge.textContent = r.status + (r.ok ? ' OK' : ' Error') + ' (' + dur + 'ms)';
+  badge.className = 'badge ' + (r.ok ? 'badge-present' : 'badge-absent');
+  box.textContent = JSON.stringify(r.body, null, 2);
+}
+
+// ---------------- PAGINATION HELPER ----------------
+function renderPagination(infoId, btnsId, page, total, pageSize, fnName) {
+  const infoEl = document.getElementById(infoId);
+  const btnsEl = document.getElementById(btnsId);
+  if (!infoEl || !btnsEl) return;
+
+  const totalPages = Math.ceil(total / pageSize) || 1;
+  const start = total === 0 ? 0 : (page - 1) * pageSize + 1;
+  const end = Math.min(page * pageSize, total);
+
+  infoEl.textContent = 'Showing ' + start + '–' + end + ' of ' + total + ' records';
+
+  let btns = '';
+  btns += '<button class="pg-btn" ' + (page <= 1 ? 'disabled' : '') + ' onclick="' + fnName + '(' + (page - 1) + ')">&#8249;</button>';
+  
+  for (let i = Math.max(1, page - 2); i <= Math.min(totalPages, page + 2); i++) {
+    btns += '<button class="pg-btn ' + (i === page ? 'active' : '') + '" onclick="' + fnName + '(' + i + ')">' + i + '</button>';
+  }
+
+  btns += '<button class="pg-btn" ' + (page >= totalPages ? 'disabled' : '') + ' onclick="' + fnName + '(' + (page + 1) + ')">&#8250;</button>';
+  btnsEl.innerHTML = btns;
+}
+
+// Initial Bootstrap
+window.addEventListener('DOMContentLoaded', () => {
+  navigate('dashboard');
+});
+</script>
+</body>
+</html>
