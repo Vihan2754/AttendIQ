@@ -801,7 +801,7 @@
             <div class="stat-icon">&#128187;</div>
             <span class="stat-pill" id="badge-db-status">Online</span>
           </div>
-          <div class="stat-num" id="stat-db">ok</div>
+          <div class="stat-num" id="stat-db">Ok</div>
           <div class="stat-desc">MongoDB Connection</div>
         </div>
         <div class="stat-card purple">
@@ -1609,27 +1609,6 @@ function populateEmployeeDropdowns() {
     if (curVal) el.value = curVal;
   });
 
-  // Default first employee for Punch In & Punch Out
-  if (cachedEmployees.length > 0) {
-    const piEmp = document.getElementById('pi-emp');
-    if (piEmp && !piEmp.value) {
-      piEmp.value = cachedEmployees[0].emp_code;
-      onPunchInEmpChange();
-    }
-    const poEmp = document.getElementById('po-emp');
-    if (poEmp && !poEmp.value) {
-      poEmp.value = cachedEmployees[0].emp_code;
-      onPunchOutEmpChange();
-    }
-    const regEmp = document.getElementById('reg-emp');
-    if (regEmp && !regEmp.value) {
-      regEmp.value = cachedEmployees[0].emp_code;
-    }
-    const mEmp = document.getElementById('m-emp');
-    if (mEmp && !mEmp.value) {
-      mEmp.value = cachedEmployees[0].emp_code;
-    }
-  }
 }
 
 // ---------------- DASHBOARD ----------------
@@ -2104,7 +2083,7 @@ function initMonthlyPage() {
 }
 
 async function loadMonthlyAnalytics() {
-  const emp = document.getElementById('m-emp').value || (cachedEmployees[0]?.emp_code || 'EMP0001');
+  const emp = document.getElementById('m-emp').value;
   const month = document.getElementById('m-month').value.trim() || DEFAULT_MONTH;
   const wrap = document.getElementById('monthly-content');
 
